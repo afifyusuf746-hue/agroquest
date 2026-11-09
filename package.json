@@ -1,0 +1,23 @@
+{
+  "name": "agroquest-antigravity",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "build": "node scripts/build.mjs",
+    "dev": "node --env-file=.env server/local.mjs",
+    "start": "node --env-file=.env server/local.mjs",
+    "db:migrate": "node --env-file=.env scripts/migrate.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@libsql/client": "0.18.0",
+    "esbuild": "0.25.12",
+    "pg": "8.23.1",
+    "three": "0.180.0"
+  },
+  "version": "1.0.0",
+  "engines": {
+    "node": "24.x"
+  }
+}

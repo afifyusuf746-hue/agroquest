@@ -1,0 +1,13 @@
+export function createCloudProgress({state,getSession,rememberRoom,restore,renderHUD}){
+let dirty=false,generation=0,timer=null,promise=null,lastSaved=0;
+const el=()=>document.getElementById('cloudstatus');
+function status(text,error=false){const b=el();if(b){b.textContent=text;b.classList.toggle('cloud-error',error)}}
+function snapshot(){return {learning:state.learning||{},completed:state.completed||[],xp:state.completed.length*100+state.farmXP+(state.flags.obby?100:0),coins:state.completed.length*50+state.bank+(state.flags.obby?50:0),harvested:state.harvested||0}}
+function mark(){dirty=true;generation++;clearTimeout(timer);if(getSession()?.learnerId){status('☁ Menunggu penyimpanan…');timer=setTimeout(()=>flush().catch(()=>{}),1800)}else status('☁ Masuk kelas untuk menyimpan ke guru')}
+async function flush(){clearTimeout(timer);if(promise)return promise;const s=getSession();if(!s?.learnerId){status('☁ Masuk kelas untuk menyimpan ke guru');return}if(!dirty)return;const version=generation;const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),10000);status('☁ Menyimpan progres…');promise=(async()=>{try{const response=await fetch('/api/rooms/progress',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+s.token},body:JSON.stringify({room:s.room,revision:s.revision||0,progress:snapshot()}),signal:controller.signal});const data=await response.json();if(!response.ok){const e=Error(data.error||'Penyimpanan gagal.');e.status=response.status;throw e}if(getSession()!==s)return;s.revision=data.revision;rememberRoom();lastSaved=data.savedAt;if(version===generation)dirty=false;status('☁ Tersimpan untuk guru · '+new Date(lastSaved).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}));}catch(e){status(e.status===409?'⚠ Konflik sesi · masuk ulang kelas':'⚠ Belum tersimpan · ketuk untuk mencoba',true);throw e}finally{clearTimeout(timeout);promise=null;if(dirty&&version!==generation&&getSession())timer=setTimeout(()=>flush().catch(()=>{}),2000)}})();return promise}
+function joined(s){if(s.learnerToken){try{localStorage.setItem('agroquest-learner',s.learnerToken)}catch{}}if(s.priorProgress)restore(s.priorProgress);renderHUD();mark()}
+function left(){clearTimeout(timer);dirty=false;status('☁ Masuk kelas untuk menyimpan ke guru')}
+const interval=setInterval(()=>{if(getSession()?.learnerId&&document.visibilityState==='visible')mark()},30000);
+if(el())el().onclick=()=>{dirty=true;flush().catch(()=>{})};status(getSession()?'☁ Menghubungkan penyimpanan…':'☁ Masuk kelas untuk menyimpan ke guru');if(getSession()?.learnerId)mark();
+return {mark,flush,joined,left,status,snapshot};
+}

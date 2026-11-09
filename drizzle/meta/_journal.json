@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1794186000000,
+      "tag": "0000_classroom",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1794187000000,
+      "tag": "0001_world3d",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794197000000,
+      "tag": "0002_teacher_progress",
+      "breakpoints": true
+    }
+  ]
+}

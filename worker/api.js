@@ -1,7 +1,7 @@
 import {cleanProgress,learnerForJoin} from './progress.js';
 const TTL=35000,CAPACITY=36;
 const colors=['#de8d48','#67937c','#7564a7','#c45f68','#488bb0'];
-const crops={carrot:45000,tomato:60000,corn:75000};
+const crops={carrot:120000,tomato:180000,corn:300000};
 function reply(data,status=200){return Response.json(data,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}})}
 async function hash(token){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(token)))).map(b=>b.toString(16).padStart(2,'0')).join('')}
 function plotPosition(slot){return {x:-21+(slot%4)*4,z:-15+Math.floor(slot/4)*4}}
